@@ -201,6 +201,15 @@
     font-size: 2em;
     margin-bottom: 10px;
     }
+
+    .popup-alert {
+  color: #ffcc00;
+  text-shadow: 0 0 10px #ffcc00;
+}
+.popup-alert h2 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
   </style>
 </head>
 <body>
@@ -286,6 +295,7 @@
     let ingresado = 0;
     let stockActual = 0;
     let indexDestino = -1;
+    
 
     const grid = document.getElementById("destinos");
 
@@ -349,41 +359,43 @@
   const total = calcularTotal();
 
   if (cantidad <= 0) {
-    mostrarPopup("⚠️ Debes comprar al menos 1 boleto.");
+    mostrarPopup("⚠️ Debes comprar al menos 1 boleto.", "alert");
     return;
   }
 
   if (cantidad > stockActual) {
-    mostrarPopup("⚠️ No hay suficientes boletos disponibles.");
+    mostrarPopup("⚠️ No hay suficientes boletos disponibles.", "alert");
     return;
   }
 
   if (ingresado < total) {
-    mostrarPopup("⚠️ Monto insuficiente.\nInserte más dinero.");
-  } else {
-    const vuelto = ingresado - total;
-    let desglose = calcularVuelto(vuelto);
+    mostrarPopup("⚠️ Monto insuficiente.\nInserte más dinero.", "alert");
+    return;
+  }
 
-    lugares[indexDestino].stock -= cantidad;
-    
-    // 🔊 Reproducir sonido solo si el destino es Quiché
-    if (destino === "Quiché") {
+  // Si todo está bien, procede con la compra
+  const vuelto = ingresado - total;
+  let desglose = calcularVuelto(vuelto);
+
+  lugares[indexDestino].stock -= cantidad;
+
+  if (destino === "Quiché") {
     let audio = document.getElementById("sonidoPago");
     audio.currentTime = 0;
     audio.play().catch(err => console.log("Error al reproducir audio:", err));
-}
-
-    mostrarPopup(
-      `✅ Compra exitosa\n\nDestino: ${destino}\n` +
-      `Boletos: ${cantidad}\n` +
-      `Total: Q${total}\nPagado: Q${ingresado}\n` +
-      `Vuelto: Q${vuelto}\n\nDesglose:\n${desglose}\n\n` +
-      `Boletos restantes: ${lugares[indexDestino].stock}`
-    );
-
-    cerrarModal();
-    refrescarTarjetas();
   }
+
+  mostrarPopup(
+    `✅ Compra exitosa\n\nDestino: ${destino}\n` +
+    `Boletos: ${cantidad}\n` +
+    `Total: Q${total}\nPagado: Q${ingresado}\n` +
+    `Vuelto: Q${vuelto}\n\nDesglose:\n${desglose}\n\n` +
+    `Boletos restantes: ${lugares[indexDestino].stock}`,
+    "success"
+  );
+
+  cerrarModal();
+  refrescarTarjetas();
 }
 
     function cancelar() {
@@ -410,10 +422,20 @@
   return desglose === "" ? "Sin vuelto" : desglose;
 }
     function mostrarPopup(mensaje, tipo = "success") {
-  let clase = tipo === "cancel" ? "popup-cancel" : "popup-success";
+  let clase = "popup-success";
+  let encabezado = "<h2>✅ Éxito</h2>";
+
+  if (tipo === "cancel") {
+    clase = "popup-cancel";
+    encabezado = "<h2>❌ Cancelado</h2>";
+  } else if (tipo === "alert") {
+    clase = "popup-alert";
+    encabezado = "<h2>⚠️ Advertencia</h2>";
+  }
+
   document.getElementById("popup-content").innerHTML =
     `<div class="${clase}">
-       ${tipo === "cancel" ? "<h2>❌ Cancelado</h2>" : "<h2>✅ Éxito</h2>"}
+       ${encabezado}
        <p>${mensaje}</p>
        <button onclick="cerrarPopup()">Aceptar</button>
      </div>`;
