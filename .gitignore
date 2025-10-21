@@ -1,0 +1,11 @@
+# Archivos y carpetas de Visual Studio
+.vs/
+*.suo
+*.user
+
+# Carpetas de compilación
+[Bb]in/
+[Oo]bj/
+
+# Ignorar dependencias de Node.js
+/node_modules

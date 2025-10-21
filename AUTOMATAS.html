@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>TicketMaster - Máquina expendedora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a1a2e);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      margin: 0;
+      padding: 20px;
+      color: #eee;
+    }
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    /* Encabezado */
+    .header { text-align: center; margin-bottom: 20px; }
+    .logo {
+      font-size: 2.8em;
+      color: #00f2fe;
+      text-shadow: 0 0 10px #00f2fe, 0 0 20px #4facfe;
+      font-weight: bold;
+    }
+    .slogan {
+      font-size: 1.2em;
+      color: #ccc;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
+    .lateral {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: linear-gradient(180deg, #0a0f29, #1a1f3c, #0a0f29);
+  background-size: 400% 400%;
+  animation: glow 10s linear infinite;
+  box-shadow: 0 0 15px rgba(0, 200, 255, 0.3);
+  z-index: -1;
+}
+.lateral.left { left: 0; }
+.lateral.right { right: 0; }
+
+@keyframes glow {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+    /* Banner animado */
+    .banner {
+      background: linear-gradient(90deg, #00f2fe, #4facfe, #00f2fe);
+      background-size: 300% 300%;
+      animation: bannerAnim 6s infinite linear;
+      padding: 15px;
+      border-radius: 12px;
+      text-align: center;
+      color: #111;
+      font-weight: bold;
+      margin-bottom: 25px;
+      box-shadow: 0 0 20px rgba(0,255,255,0.5);
+    }
+    @keyframes bannerAnim {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+    
+    /* Instrucciones */
+    .instrucciones {
+      max-width: 600px;
+      margin: auto;
+      background: rgba(255,255,255,0.05);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,255,255,0.3);
+      box-shadow: 0 0 15px rgba(0,255,255,0.2);
+      margin-bottom: 30px;
+    }
+    .instrucciones h2 {
+      color: #00f2fe;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .instrucciones ol {
+      list-style: none;
+      padding: 0;
+    }
+    .instrucciones li {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(0,255,255,0.1);
+      border-radius: 8px;
+      text-align: center;
+      color: #eee;
+      font-weight: bold;
+    }
+    /* Grid de destinos */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 25px;
+      max-width: 1100px;
+      margin: auto;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,255,255,0.3);
+      box-shadow: 0 0 20px rgba(0,255,255,0.2);
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-10px) scale(1.05);
+      box-shadow: 0 0 30px rgba(0,255,255,0.6);
+    }
+    .card h3 { margin: 5px 0; color: #00e6e6; font-size: 1.2em; }
+    .card p { margin: 3px 0; color: #ccc; }
+    .card button {
+      margin-top: 12px; padding: 12px 18px; border: none; border-radius: 10px;
+      background: #00f2fe; color: #111; font-weight: bold; cursor: pointer;
+      transition: 0.3s; box-shadow: 0 0 15px #00f2fe, 0 0 30px #4facfe;
+      animation: pulse 2s infinite;
+    }
+    .card button:hover {
+      background: #4facfe; color: #fff;
+      box-shadow: 0 0 25px #00f2fe, 0 0 50px #4facfe;
+    }
+    .card button:disabled {
+      background: #555; color: #999; cursor: not-allowed;
+      box-shadow: none; animation: none;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 10px #00f2fe; }
+      50% { box-shadow: 0 0 25px #00f2fe, 0 0 50px #4facfe; }
+      100% { box-shadow: 0 0 10px #00f2fe; }
+    }
+    /* Modal y popup */
+    .modal, .popup {
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+      justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-content, .popup-content {
+      background: rgba(20, 20, 40, 0.95);
+      padding: 25px; border-radius: 15px; width: 400px; text-align: center;
+      box-shadow: 0 0 30px rgba(0,255,255,0.6);
+      border: 1px solid rgba(0,255,255,0.5); color: #eee;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn { from {opacity: 0; transform: scale(0.8);} to {opacity: 1; transform: scale(1);} }
+    .modal-content h2 { color: #00f2fe; text-shadow: 0 0 10px #00f2fe; }
+    .modal-content input {
+      width: 80%; padding: 10px; margin: 10px 0; border-radius: 6px;
+      border: 1px solid #00f2fe; background: #111; color: #0ff; text-align: center;
+    }
+    .money-buttons button {
+      margin: 5px; padding: 10px 15px; border: none; border-radius: 8px;
+      background: #111; color: #0ff; font-weight: bold; cursor: pointer;
+      border: 1px solid #0ff; transition: 0.3s;
+    }
+    .money-buttons button:hover { background: #0ff; color: #111; box-shadow: 0 0 15px #0ff; }
+    .actions button {
+      margin: 10px; padding: 12px 20px; border: none; border-radius: 8px;
+      font-weight: bold; cursor: pointer; transition: 0.3s;
+    }
+    .pay { background: #28a745; color: white; box-shadow: 0 0 15px #28a745; }
+    .pay:hover { box-shadow: 0 0 30px #28a745; }
+    .cancel { background: #dc3545; color: white; box-shadow: 0 0 15px #dc3545; }
+    .cancel:hover { box-shadow: 0 0 30px #dc3545; }
+    .popup-content { color: #0ff; white-space: pre-line; font-size: 1.1em; }
+    .popup-content button {
+      margin-top: 15px; padding: 10px 20px; border: none; border-radius: 8px;
+      background: #0ff; color: #111; font-weight: bold; cursor: pointer;
+      box-shadow: 0 0 15
+            px #0ff;
+    }
+
+    /* Popup de éxito */
+    .popup-success {
+    color: #0f0;
+    text-shadow: 0 0 10px #0f0;
+    }
+
+/* Popup de cancelación */
+    .popup-cancel {
+    color: #ff4d4d;
+    text-shadow: 0 0 10px #ff4d4d;
+    }
+
+    .popup-cancel h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+    <div class="lateral left"></div>
+    <div class="lateral right"></div>
+   <audio id="sonidoPago" src="A SII.ogg" preload="auto"></audio>
+  <!-- Encabezado -->
+  <header class="header">
+    <div class="logo">🎟️ TicketMaster</div>
+    <div class="slogan">Compra tus boletos fácil, rápido y seguro</div>
+  </header>
+
+  <!-- Banner animado -->
+  <section class="banner">
+    <p>Bienvenido a TicketMaster</p>
+    <p>La forma más moderna de adquirir tus boletos</p>
+  </section>
+
+  <!-- Instrucciones -->
+  <section class="instrucciones">
+    <h2>Cómo funciona</h2>
+    <ol>
+      <li>Selecciona tu destino</li>
+      <li>Elige la cantidad de boletos</li>
+      <li>Inserta dinero y paga</li>
+      <li>Recibe tu boleto y ¡disfruta tu viaje!</li>
+    </ol>
+  </section>
+
+  <!-- Grid de destinos -->
+  <div class="grid" id="destinos"></div>
+
+  <!-- Modal de compra -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2 id="destino"></h2>
+      <p>Precio por boleto: Q<span id="precio"></span></p>
+      <p>Boletos disponibles: <span id="stock"></span></p>
+      <label>Cantidad:</label>
+      <input type="number" id="cantidad" value="1" min="1" oninput="actualizarPantalla()">
+      <div class="money-buttons">
+        <p>Insertar billete:</p>
+        <button onclick="insertar(5)">Q5</button>
+        <button onclick="insertar(10)">Q10</button>
+        <button onclick="insertar(20)">Q20</button>
+        <button onclick="insertar(50)">Q50</button>
+        <button onclick="insertar(100)">Q100</button>
+      </div>
+      <p><b>Total:</b> Q<span id="total">0</span></p>
+      <p><b>Ingresado:</b> Q<span id="ingresado">0</span></p>
+      <div class="actions">
+        <button class="pay" onclick="pagar()">Pagar</button>
+        <button class="cancel" onclick="cancelar()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Popup de confirmación -->
+  <div class="popup" id="popup">
+    <div class="popup-content" id="popup-content">
+      <button onclick="cerrarPopup()">Aceptar</button>
+    </div>
+  </div>
+
+  <script>
+    const lugares = [
+      { nombre: "Asunción Mita", precio: 15, stock: 15 },
+      { nombre: "Atescatempa", precio: 20, stock: 20 },
+      { nombre: "El Progreso (Jutiapa)", precio: 10, stock: 25 },
+      { nombre: "Santa Catarina Mita", precio: 10, stock: 15 },
+      { nombre: "Jalpatagua", precio: 30, stock: 20 },
+      { nombre: "Agua Blanca", precio: 15, stock: 15 },
+      { nombre: "Moyuta", precio: 30, stock: 20 },
+      { nombre: "Quiché", precio: 20, stock: 20 },
+      { nombre: "Monjas (Jalapa)", precio: 40, stock: 25 },
+      { nombre: "Jalapa (cabecera)", precio: 45, stock: 25 },
+      { nombre: "Chiquimula (cabecera)", precio: 20, stock: 30 },
+      { nombre: "Guatemala (capital)", precio: 50, stock: 35 }
+    ];
+
+    let precio = 0;
+    let destino = "";
+    let ingresado = 0;
+    let stockActual = 0;
+    let indexDestino = -1;
+
+    const grid = document.getElementById("destinos");
+
+    function refrescarTarjetas() {
+      grid.innerHTML = "";
+      lugares.forEach((l, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${l.nombre}</h3>
+          <p>Precio: Q${l.precio}</p>
+          <p>Disponibles: ${l.stock}</p>
+          <button ${l.stock === 0 ? "disabled" : ""} onclick="abrirModal(${i})">
+            ${l.stock === 0 ? "Agotado" : "Usar"}
+          </button>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    refrescarTarjetas();
+
+    function abrirModal(i) {
+      indexDestino = i;
+      destino = lugares[i].nombre;
+      precio = lugares[i].precio;
+      stockActual = lugares[i].stock;
+      ingresado = 0;
+      document.getElementById("destino").innerText = destino;
+      document.getElementById("precio").innerText = precio;
+      document.getElementById("stock").innerText = stockActual;
+      document.getElementById("cantidad").value = 1;
+      actualizarPantalla();
+      document.getElementById("modal").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").style.display = "none";
+    }
+
+    function calcularTotal() {
+      const cantidad = parseInt(document.getElementById("cantidad").value);
+      return precio * cantidad;
+    }
+
+    function actualizarPantalla() {
+      const cantidad = parseInt(document.getElementById("cantidad").value);
+      if (cantidad > stockActual) {
+        document.getElementById("cantidad").value = stockActual;
+      }
+      document.getElementById("total").innerText = calcularTotal();
+      document.getElementById("ingresado").innerText = ingresado;
+    }
+
+    function insertar(valor) {
+      ingresado += valor;
+      actualizarPantalla();
+    }
+
+   function pagar() {
+  const cantidad = parseInt(document.getElementById("cantidad").value);
+  const total = calcularTotal();
+
+  if (cantidad <= 0) {
+    mostrarPopup("⚠️ Debes comprar al menos 1 boleto.");
+    return;
+  }
+
+  if (cantidad > stockActual) {
+    mostrarPopup("⚠️ No hay suficientes boletos disponibles.");
+    return;
+  }
+
+  if (ingresado < total) {
+    mostrarPopup("⚠️ Monto insuficiente.\nInserte más dinero.");
+  } else {
+    const vuelto = ingresado - total;
+    let desglose = calcularVuelto(vuelto);
+
+    lugares[indexDestino].stock -= cantidad;
+    
+    // 🔊 Reproducir sonido solo si el destino es Quiché
+    if (destino === "Quiché") {
+    let audio = document.getElementById("sonidoPago");
+    audio.currentTime = 0;
+    audio.play().catch(err => console.log("Error al reproducir audio:", err));
+}
+
+    mostrarPopup(
+      `✅ Compra exitosa\n\nDestino: ${destino}\n` +
+      `Boletos: ${cantidad}\n` +
+      `Total: Q${total}\nPagado: Q${ingresado}\n` +
+      `Vuelto: Q${vuelto}\n\nDesglose:\n${desglose}\n\n` +
+      `Boletos restantes: ${lugares[indexDestino].stock}`
+    );
+
+    cerrarModal();
+    refrescarTarjetas();
+  }
+}
+
+    function cancelar() {
+  if (ingresado > 0) {
+    let desglose = calcularVuelto(ingresado);
+    mostrarPopup(
+      `Operación cancelada.<br>Se devuelve Q${ingresado} ingresados.<br><br>Desglose:<br>${desglose}`,
+      "cancel"
+    );
+  }
+  cerrarModal();
+}
+
+    function calcularVuelto(vuelto) {
+  const billetes = [100, 50, 20, 10, 5];
+  let desglose = "";
+  billetes.forEach(b => {
+    let cantidad = Math.floor(vuelto / b);
+    if (cantidad > 0) {
+      desglose += `${cantidad} billete(s) de Q${b}\n`;
+      vuelto -= cantidad * b;
+    }
+  });
+  return desglose === "" ? "Sin vuelto" : desglose;
+}
+    function mostrarPopup(mensaje, tipo = "success") {
+  let clase = tipo === "cancel" ? "popup-cancel" : "popup-success";
+  document.getElementById("popup-content").innerHTML =
+    `<div class="${clase}">
+       ${tipo === "cancel" ? "<h2>❌ Cancelado</h2>" : "<h2>✅ Éxito</h2>"}
+       <p>${mensaje}</p>
+       <button onclick="cerrarPopup()">Aceptar</button>
+     </div>`;
+  document.getElementById("popup").style.display = "flex";
+}
+
+    function cerrarPopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+  </script>
+</body>
+</html>
